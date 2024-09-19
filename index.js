@@ -19,6 +19,7 @@ hashParams.forEach(param => {
     const value = decodeURIComponent(param);
     console.log(value);
     let bytev=getFileBytesWithHeader(value,'login',getCookie('login'),runafterFetch);
+    console.log(bytev);
     pdfByteslist.push(bytev);
 });
 
