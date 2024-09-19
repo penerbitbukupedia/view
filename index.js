@@ -14,17 +14,29 @@ if (!decodedURL) {
 const hashParams = decodedURL.split('&&');
 const pdfByteslist = [];
 
-hashParams.forEach(param => {
-    // Assuming param directly contains PDF URLs without keys
-    const value = decodeURIComponent(param);
-    console.log(value);
-    let bytev=getFileBytesWithHeader(value,'login',getCookie('login'),runafterFetch);
-    console.log(bytev);
-    pdfByteslist.push(bytev);
-});
+// Function to fetch PDF bytes and handle asynchronous behavior
+async function fetchPDFBytes() {
+    const promises = hashParams.map(async (param) => {
+        const value = decodeURIComponent(param);
+        console.log(value);
 
-// Load and display concatenated PDFs
-displayConcatenatedPDFs(pdfByteslist);
+        // Fetch PDF bytes with appropriate headers
+        const bytev = await getFileBytesWithHeader(value, 'login', getCookie('login'),runafterFetch);
+        console.log(bytev);
+
+        return bytev;  // Return the PDF bytes
+    });
+
+    // Wait for all the PDFs to be fetched
+    const pdfByteslist = await Promise.all(promises);
+
+    // Once all PDFs are fetched, display concatenated PDFs
+    displayConcatenatedPDFs(pdfByteslist);
+}
+
+// Execute the PDF fetching
+fetchPDFBytes();
+
 
 function runafterFetch(result){
     console.log(result);
