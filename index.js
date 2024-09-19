@@ -12,14 +12,14 @@ if (!decodedURL) {
 }
 
 const hashParams = decodedURL.split('&&');
-const pdfUrls = [];
+const pdfByteslist = [];
 
 hashParams.forEach(param => {
     // Assuming param directly contains PDF URLs without keys
     const value = decodeURIComponent(param);
     console.log(value);
     let bytev=getFileBytesWithHeader(value,'login',getCookie('login'),runafterFetch);
-    pdfUrls.push(bytev);
+    pdfByteslist.push(bytev);
 });
 
 // Load and display concatenated PDFs
