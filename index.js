@@ -1,3 +1,5 @@
+import {getFileBytesWithHeader} from "https://cdn.jsdelivr.net/gh/jscroot/lib@0.0.8/api.js";
+import {getCookie} from "https://cdn.jsdelivr.net/gh/jscroot/lib@0.0.8/cookie.js";
 import { displayConcatenatedPDFs } from "./lib.js";
 
 const decodedURL = atob(decodeURIComponent(window.location.hash.substring(1)));
@@ -9,14 +11,20 @@ if (!decodedURL) {
     window.location.href = '404.html';
 }
 
-const hashParams = decodedURL.substring(1).split('&');
+const hashParams = decodedURL.split('&&');
 const pdfUrls = [];
 
 hashParams.forEach(param => {
     // Assuming param directly contains PDF URLs without keys
     const value = decodeURIComponent(param);
-    pdfUrls.push(value);
+    console.log(value);
+    let bytev=getFileBytesWithHeader(value,'login',getCookie('login'),runafterFetch);
+    pdfUrls.push(bytev);
 });
 
 // Load and display concatenated PDFs
-displayConcatenatedPDFs(pdfUrls);
+displayConcatenatedPDFs(pdfByteslist);
+
+function runafterFetch(result){
+    console.log(result);
+}

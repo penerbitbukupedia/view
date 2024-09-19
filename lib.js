@@ -3,15 +3,12 @@ import { isMobile } from 'https://cdn.jsdelivr.net/gh/jscroot/useragent@0.0.1/cr
 
 const loaderSection = document.getElementById('loaderSection');
 
-export async function displayConcatenatedPDFs(pdfUrls) {
+export async function displayConcatenatedPDFs(pdfByteslist) {
   const pdfDocs = [];
 
   try {
     // Load all PDFs
-    for (const url of pdfUrls) {
-
-      // Fetch PDF bytes
-      const pdfBytes = await fetch(url).then(response => response.arrayBuffer());
+    for (const pdfBytes of pdfByteslist) {
       // Load PDF document
       const pdfDoc = await PDFDocument.load(pdfBytes);
       pdfDocs.push(pdfDoc);
