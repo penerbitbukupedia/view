@@ -1,4 +1,4 @@
-import {getFileBytesWithHeader} from "https://cdn.jsdelivr.net/gh/jscroot/lib@0.0.8/api.js";
+//import {getFileBytesWithHeader} from "https://cdn.jsdelivr.net/gh/jscroot/lib@0.0.8/api.js";
 import {getCookie} from "https://cdn.jsdelivr.net/gh/jscroot/lib@0.0.8/cookie.js";
 import { displayConcatenatedPDFs } from "./lib.js";
 
@@ -40,4 +40,35 @@ fetchPDFBytes();
 
 function runafterFetch(result){
     console.log(result);
+}
+
+
+export function getFileBytesWithHeader(target_url, tokenkey, tokenvalue, responseFunction) {
+    let myHeaders = new Headers();
+    myHeaders.append(tokenkey, tokenvalue);
+
+    let requestOptions = {
+        method: 'GET',
+        redirect: 'follow',
+        headers: myHeaders
+    };
+
+    // Return a Promise that resolves the fetched data
+    return fetch(target_url, requestOptions)
+        .then(response => {
+            if (response.status === 200) {
+                // Return file bytes as an ArrayBuffer
+                return response.arrayBuffer();
+            } else {
+                // Handle non-200 status codes by calling the responseFunction and returning null
+                return response.json().then(result => {
+                    responseFunction(result);
+                    return null;  // Return null or handle as appropriate
+                });
+            }
+        })
+        .catch(error => {
+            console.log('Error fetching file:', error);
+            return null;  // Return null in case of an error
+        });
 }
