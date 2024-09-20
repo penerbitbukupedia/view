@@ -1,5 +1,4 @@
-//import {getFileBytesWithHeader} from "https://cdn.jsdelivr.net/gh/jscroot/lib@0.0.8/api.js";
-import {getCookie} from "https://cdn.jsdelivr.net/gh/jscroot/lib@0.0.8/cookie.js";
+import { getCookie } from "https://cdn.jsdelivr.net/gh/jscroot/lib@0.0.8/cookie.js";
 import { displayConcatenatedPDFs } from "./lib.js";
 
 const decodedURL = atob(decodeURIComponent(window.location.hash.substring(1)));
@@ -14,36 +13,30 @@ if (!decodedURL) {
 const hashParams = decodedURL.split('&&');
 const pdfByteslist = [];
 
-// Function to fetch PDF bytes and handle asynchronous behavior
-async function fetchPDFBytes() {
-    const promises = hashParams.map(async (param) => {
+// Function to fetch and store PDF bytes
+async function fetchPDFs() {
+    const promises = hashParams.map(param => {
         const value = decodeURIComponent(param);
         console.log(value);
-
-        // Fetch PDF bytes with appropriate headers
-        const bytev = await getFileBytesWithHeader(value, 'login', getCookie('login'),runafterFetch);
-        console.log(bytev);
-
-        return bytev;  // Return the PDF bytes
+        return getFileBytesWithHeader(value, 'login', getCookie('login'));
     });
 
-    // Wait for all the PDFs to be fetched
-    const pdfByteslist = await Promise.all(promises);
+    // Wait for all PDFs to be fetched and store them in pdfByteslist
+    const pdfResults = await Promise.all(promises);
+    pdfResults.forEach(result => {
+        if (result) {
+            pdfByteslist.push(result);
+        }
+    });
 
-    // Once all PDFs are fetched, display concatenated PDFs
+    // Once all PDFs are fetched, display them
     displayConcatenatedPDFs(pdfByteslist);
 }
 
-// Execute the PDF fetching
-fetchPDFBytes();
+fetchPDFs();
 
-
-function runafterFetch(result){
-    console.log(result);
-}
-
-
-export function getFileBytesWithHeader(target_url, tokenkey, tokenvalue, responseFunction) {
+//get file bytes if 200, otherwise return json
+export function getFileBytesWithHeader(target_url, tokenkey, tokenvalue) {
     let myHeaders = new Headers();
     myHeaders.append(tokenkey, tokenvalue);
 
@@ -53,22 +46,21 @@ export function getFileBytesWithHeader(target_url, tokenkey, tokenvalue, respons
         headers: myHeaders
     };
 
-    // Return a Promise that resolves the fetched data
     return fetch(target_url, requestOptions)
         .then(response => {
             if (response.status === 200) {
-                // Return file bytes as an ArrayBuffer
-                return response.arrayBuffer();
+                // If status is 200, return the file bytes
+                return response.arrayBuffer();  // This is a function call
             } else {
-                // Handle non-200 status codes by calling the responseFunction and returning null
+                // For non-200 responses, parse as JSON
                 return response.json().then(result => {
-                    responseFunction(result);
-                    return null;  // Return null or handle as appropriate
+                    console.log('Error:', result); // Log the error response
+                    return null;  // Return null if there is an error
                 });
             }
         })
         .catch(error => {
-            console.log('Error fetching file:', error);
-            return null;  // Return null in case of an error
+            console.log('Fetch error:', error);
+            return null; // Return null in case of an error
         });
 }
