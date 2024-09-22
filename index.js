@@ -55,6 +55,11 @@ export function getFileBytesWithHeader(target_url, tokenkey, tokenvalue) {
                 // For non-200 responses, parse as JSON
                 return response.json().then(result => {
                     console.log('Error:', result); // Log the error response
+                    Swal.fire({
+                      icon: 'error',
+                      title: 'Oops...',
+                      text: result.response,
+                    });
                     return null;  // Return null if there is an error
                 });
             }
